@@ -11,6 +11,7 @@ var margin = {
   left: 100
 };
 
+
 // Define dimensions of the chart area
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
