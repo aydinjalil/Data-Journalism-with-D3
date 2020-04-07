@@ -188,9 +188,24 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 10)
+    .attr("r", 12)
     .attr("fill", "blue")
     .attr("opacity", ".5");
+
+   var circlesGroup = chartGroup.selectAll()
+    .data(complete_data)
+    .enter()
+    .append("text")
+    .attr("x", d => xLinearScale(d[chosenXAxis]))
+    .attr("y", d => yLinearScale(d[chosenYAxis]))
+    .style("font-size", "10px")
+    .style("text-anchor", "middle")
+    // .attr("r", 10)
+    .attr("fill", "white")
+    .text(d=>d.abbr);
+
+
+
 
   // Create group for  2 x- axis labels
   var labelsGroup = chartGroup.append("g")
@@ -221,12 +236,12 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
   // append y axis  
   var healthLabel = labelsGroup.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 0 - (height / 2))
-    .attr("x", 0 - margin.left)
+    .attr("y", 0-svgHeight-margin.bottom)
+    .attr("x", 0)
     .attr("value", "healthcare")
     // .attr("dy", "1em")
     .classed("active", true)
-    .style("text-anchor", "middle")
+    // .style("text-anchor", "middle")
     .text("Lacks Healthcare(%)");
 
   var smokeLabel = labelsGroup.append("text")
