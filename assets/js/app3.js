@@ -16,11 +16,17 @@ var margin = {
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 
-var scatter_selector = d3.select("#scatter");
+var aspect = width/height,
+   scatter_selector = d3.select('#scatter');
+
+
+
+// var scatter_selector = d3.select("#scatter");
 
 var svg = scatter_selector.append("svg")
                   .attr("width", svgWidth)
                   .attr("height", svgHeight);
+
 
 var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left+40}, ${margin.top})`);
@@ -40,7 +46,7 @@ function xScale(data, chosenXAxis) {
 
 }
 
-// ** function for Yscale added new
+// ** function for Yscale
 function yScale(data, chosenYAxis) {
   // create scales
   var yLinearScale = d3.scaleLinear()
@@ -48,31 +54,29 @@ function yScale(data, chosenYAxis) {
       d3.max(data, d => d[chosenYAxis]) * 1.2
     ])
     .range([height, 0]); 
-  // var yLinearScale = d3.scaleLinear()
-  //   .domain([0, d3.max(data, d => d[chosenYAxis])])
-  //   .range([height, 0]);
 
   return yLinearScale;
 
 }
 
-// function used for updating xAxis var upon click on axis label
+// function used for updating xAxis var upon click on X axis label
 function renderXAxes(newXScale, xAxis) {
   var bottomAxis = d3.axisBottom(newXScale);
   
     xAxis.transition()
-    .duration(1000)
+    .duration(500)
     .call(bottomAxis);
 
     return xAxis;  
 
 }
 
+// function used for updating yAxis var upon click on Y axis label
 function renderYAxes(newYScale, yAxis) {
   var leftAxis = d3.axisLeft(newYScale);
   
     yAxis.transition()
-    .duration(1000)
+    .duration(500)
     .call(leftAxis);
 
     return yAxis;  
@@ -81,26 +85,48 @@ function renderYAxes(newYScale, yAxis) {
 
 
 
-// function used for updating circles group with a transition to
+// function used for updating circles group based on X axis changewith a transition to
 // new circles
 function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
 
   circlesGroup.transition()
-    .duration(1000)
+    .duration(500)
     .attr("cx", d => newXScale(d[chosenXAxis]));
 
   return circlesGroup;
 }
 
+// function used for updating circles group based on Y axis changewith a transition to
+// new circles 
 function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
   circlesGroup.transition()
-    .duration(1000)
+    .duration(500)
     .attr("cy", d => newYScale(d[chosenYAxis]));
 
   return circlesGroup;
 }
 
+// Function renders the inner text that is shown in each circle when X axis is changing. 
+function renderXInnerText(innerTextGroup, newXScale, newXAxis){
+ // d3.select(".inner_text").selectAll("text").remove()
+  innerTextGroup.transition()
+    .duration(500)
+    .attr("x", d => newXScale(d[chosenXAxis]))
+
+    }
+
+// Function renders the inner text that is shown in each circle when Y axis is changing. 
+function renderYInnerText(innerTextGroup, newYScale, newYAxis){
+ // d3.select(".inner_text").selectAll("text").remove()
+     innerTextGroup.transition()
+    .duration(500)
+    .attr("y", d => newYScale(d[newYAxis]))
+
+    }
+
+
+// This function updates the popup information on mouseOver event depending on the chosen x and y labels
 function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
   var label_x;
@@ -133,10 +159,10 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
       return (`${d.state}<br>${label_x} ${d[chosenXAxis]}<br>${label_y} ${d[chosenYAxis]}`);
     });
 
-  circlesGroup.call(toolTip);
+  chartGroup.call(toolTip);
 
   circlesGroup.on("mouseover", function(data) {
-    toolTip.show(data);
+    toolTip.show(data, this);
   })
     // onmouseout event
     .on("mouseout", function(data, index) {
@@ -148,11 +174,6 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
 
 // Read csv file
-// var data = d3.csv("./assets/data/static/data.csv");
-
-
-
-// var circle_element = svg.append("circle");
 
 d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
   if (err) throw err;
@@ -169,14 +190,6 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
 
   var xLinearScale = xScale(complete_data, chosenXAxis);
   var yLinearScale = yScale(complete_data, chosenYAxis);
-  // xLinearScale function above csv import
-  // var xLinearScale = xScale(complete_data, chosenXAxis);
-  // // var yLinearScale = yScale(complete_data, chosenYAxis);
-
-  // // Create y scale function
-  // var yLinearScale = d3.scaleLinear()
-  //   .domain([0, d3.max(complete_data, d => d[chosenYAxis])])
-  //   .range([height, 0]);
 
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
@@ -193,11 +206,10 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     // .attr("transform", `translate(${height}, ${width})`)
     .call(leftAxis);
 
-  // append y axis
-  // chartGroup.append("g")
-  //   .call(leftAxis);
-
-  // append initial circles
+ 
+ // circlesGroupd is the new variable that will help us further when we want to change the positions
+ // of each circle depending on the X or Y axis label click. Will will be transitioning the
+ // whole group of circles.
   var circlesGroup = chartGroup.selectAll("circle")
     .data(complete_data)
     .enter()
@@ -208,19 +220,21 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     .attr("fill", "blue")
     .attr("opacity", ".5");
 
+  // innerTextGroup is the new variable that will help us further when we want to change the positions
+  // of each text inside the circle depending on the X or Y axis label click. Will will be transitioning the
+  // whole group of texts.
+    var innerTextGroup = chartGroup.selectAll()
+      .classed("inner_text", true)
+      .data(complete_data)
+      .enter()
+      .append("text")
+      .attr("x", d => xLinearScale(d[chosenXAxis]))
+      .attr("y", d => yLinearScale(d[chosenYAxis]))
+      .text(d=>d.abbr)
+      .style("font-size", "10px")
+      .style("text-anchor", "middle")
+      .attr("fill", "white");
 
-
-   chartGroup.selectAll()
-    .data(complete_data)
-    .enter()
-    .append("text")
-    .attr("x", d => xLinearScale(d[chosenXAxis]))
-    .attr("y", d => yLinearScale(d[chosenYAxis]))
-    .style("font-size", "10px")
-    .style("text-anchor", "middle")
-    // .attr("r", 12)
-    .attr("fill", "white")
-    .text(d=>d.abbr);
 
 
   // Create group for  3 x- axis labels
@@ -296,7 +310,6 @@ var yLabelsGroup = chartGroup.append("g")
         // replaces chosenXAxis with value
         chosenXAxis = value;
 
-        // console.log(chosenXAxis)
 
         // functions here found above csv import
         // updates x scale for new data
@@ -307,6 +320,8 @@ var yLabelsGroup = chartGroup.append("g")
 
         // updates circles with new x values
         circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
+        // change the location of the inner text to the new location of the circle
+        renderXInnerText(innerTextGroup, xLinearScale, chosenXAxis);
 
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
@@ -359,8 +374,6 @@ var yLabelsGroup = chartGroup.append("g")
         // replaces chosenXAxis with value
         chosenYAxis = value;
 
-        // console.log(chosenXAxis)
-
         // functions here found above csv import
         // updates x scale for new data
         yLinearScale = yScale(complete_data, chosenYAxis);
@@ -368,9 +381,11 @@ var yLabelsGroup = chartGroup.append("g")
         // updates x axis with transition
         yAxis = renderYAxes(yLinearScale, yAxis);
 
-        // updates circles with new x values
+        // updates circles with new y values
         circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
-
+        // change the location of text based on the new position of the circle
+        renderYInnerText(innerTextGroup, yLinearScale, chosenYAxis);
+        
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
@@ -411,8 +426,16 @@ var yLabelsGroup = chartGroup.append("g")
             .classed("inactive", true);
         }
       }
+      y_inner_text(chosenYAxis);
 });
 
 }).catch(function(error) {
   console.log(error);
 });
+
+d3.select(window)
+  .on("resize", function() {
+    var targetWidth = scatter_selector.node().getBoundingClientRect().width;
+    scatter_selector.attr("width", targetWidth);
+    scatter_selector.attr("height", targetWidth / aspect);
+  });
