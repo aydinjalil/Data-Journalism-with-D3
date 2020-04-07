@@ -43,14 +43,14 @@ function xScale(data, chosenXAxis) {
 // ** function for Yscale added new
 function yScale(data, chosenYAxis) {
   // create scales
-  // var yLinearScale = d3.scaleLinear()
-  //   .domain([0, d3.max(data, d => d[chosenYAxis]) * 0.8,
-  //     d3.max(data, d => d[chosenYAxis]) * 1.2
-  //   ])
-  //   .range([height, 0]); 
   var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d[chosenYAxis])])
-    .range([height, 0]);
+    .domain([d3.min(data, d => d[chosenYAxis]) * 0.8,
+      d3.max(data, d => d[chosenYAxis]) * 1.2
+    ])
+    .range([height, 0]); 
+  // var yLinearScale = d3.scaleLinear()
+  //   .domain([0, d3.max(data, d => d[chosenYAxis])])
+  //   .range([height, 0]);
 
   return yLinearScale;
 
@@ -208,6 +208,8 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     .attr("fill", "blue")
     .attr("opacity", ".5");
 
+
+
    chartGroup.selectAll()
     .data(complete_data)
     .enter()
@@ -219,23 +221,6 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     // .attr("r", 12)
     .attr("fill", "white")
     .text(d=>d.abbr);
-
-  //  chartGroup.append("text")
-  // .style("font-size", "12px")
-  // .selectAll("tspan")
-  // .data(complete_data)
-  // .enter()
-  // .append("tspan")
-  //     .attr("x", function(data) {
-  //         return xLinearScale(data[chosenXAxis] +1.3);
-  //     })
-  //     .attr("y", function(data) {
-  //         return yLinearScale(data[chosenYAxis] +.1);
-  //     })
-  //     .text(function(data) {
-  //         return data.abbr
-  //     });
-
 
 
   // Create group for  3 x- axis labels
@@ -263,6 +248,7 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     .classed("inactive", true)
     .text("Household Income (Median)");
 
+  // Create group for  3 y- axis labels
 var yLabelsGroup = chartGroup.append("g")
     .attr("transform", `translate(${0-margin.left}, ${height/2})`);
 
@@ -295,33 +281,7 @@ var yLabelsGroup = chartGroup.append("g")
     .classed("inactive", true)
     .text("Obese(%)");
 
-  // append y axis
-  // var healthChart = chartGroup.append("text")
-  //   .attr("transform", "rotate(-90)")
-  //   .attr("y", 0 - margin.left)
-  //   .attr("x", 0 - (height / 2))
-  //   .attr("value", "healthcare")
-  //   .attr("dy", "1em")
-  //   .classed("axis-text", true)
-  //   .text("Lacks Healthcare(%)");
 
-  //   var healthChart = chartGroup.append("text")
-  //   .attr("transform", "rotate(-90)")
-  //   .attr("y", 20 - margin.left)
-  //   .attr("x", 0 - (height / 2))
-  //   .attr("value", "smokes")
-  //   .attr("dy", "1em")
-  //   .classed("axis-text", true)
-  //   .text("Smokes(%)");
-
-  //   var healthChart = chartGroup.append("text")
-  //   .attr("transform", "rotate(-90)")
-  //   .attr("y", 40 - margin.left)
-  //   .attr("x", 0 - (height / 2))
-  //   .attr("value", "obesity")
-  //   .attr("dy", "1em")
-  //   .classed("axis-text", true)
-  //   .text("Obese(%)");
 
   // updateToolTip function above csv import
   var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
