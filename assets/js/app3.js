@@ -112,7 +112,7 @@ function renderXInnerText(innerTextGroup, newXScale, newXAxis){
  // d3.select(".inner_text").selectAll("text").remove()
   innerTextGroup.transition()
     .duration(500)
-    .attr("x", d => newXScale(d[chosenXAxis]))
+    .attr("x", d => newXScale(d[newXAxis]))
 
     }
 
@@ -216,7 +216,7 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 12)
+    .attr("r", 14)
     .attr("fill", "blue")
     .attr("opacity", ".5");
 
@@ -231,7 +231,7 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
       .attr("x", d => xLinearScale(d[chosenXAxis]))
       .attr("y", d => yLinearScale(d[chosenYAxis]))
       .text(d=>d.abbr)
-      .style("font-size", "10px")
+      .style("font-size", "12px")
       .style("text-anchor", "middle")
       .attr("fill", "white");
 
@@ -438,4 +438,4 @@ d3.select(window)
     var targetWidth = scatter_selector.node().getBoundingClientRect().width;
     scatter_selector.attr("width", targetWidth);
     scatter_selector.attr("height", targetWidth / aspect);
-  });
+  });8
