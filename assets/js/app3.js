@@ -231,7 +231,7 @@ d3.csv("./assets/data/static/data.csv").then(function(complete_data, err) {
       .attr("x", d => xLinearScale(d[chosenXAxis]))
       .attr("y", d => yLinearScale(d[chosenYAxis]))
       .text(d=>d.abbr)
-      .style("font-size", "12px")
+      .style("font-size", "10px")
       .style("text-anchor", "middle")
       .attr("fill", "white");
 
