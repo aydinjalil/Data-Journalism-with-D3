@@ -133,17 +133,17 @@ function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
   var label_y;
 
   if (chosenXAxis === "poverty") {
-    label_x = "Poverty: ";
+    label_x = "Poverty(%): ";
   }
   else if (chosenXAxis === "age") {
     label_x = "Age (Median):";
   }
   else{
-    label_x = "Household Income (Median):"
+    label_x = "Household Income (Median) in USD:"
   }
 
   if (chosenYAxis === "healthcare") {
-    label_y = "Lack of HC: ";
+    label_y = "Lack of HC %: ";
   }
   else if (chosenYAxis === "smokes") {
     label_y = "Smokes(%):";
@@ -432,10 +432,3 @@ var yLabelsGroup = chartGroup.append("g")
 }).catch(function(error) {
   console.log(error);
 });
-
-d3.select(window)
-  .on("resize", function() {
-    var targetWidth = scatter_selector.node().getBoundingClientRect().width;
-    scatter_selector.attr("width", targetWidth);
-    scatter_selector.attr("height", targetWidth / aspect);
-  });8
